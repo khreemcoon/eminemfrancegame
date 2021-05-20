@@ -115,6 +115,8 @@ bool Init(){
 	click     = Mix_LoadWAV("sfx/click.wav");
 	victory   = Mix_LoadWAV("sfx/victory.wav");
 	loss      = Mix_LoadWAV("sfx/loss.wav");
+	//music
+	mainMusic = Mix_LoadMUS("sfx/music.wav");
 
 	//yayy
 	return true;
@@ -167,7 +169,7 @@ void Input(){
 						if(SDL_BUTTON_LEFT){
 							int x, y;
 							SDL_GetMouseState(&x, &y);
-							if(playButton.Collision(x,y,3,3,playButton.getX(),playButton.getY(),playButton.getW(),playButton.getH())){GAMESTATE = 4; Mix_PlayChannel(-1, click, 0);}
+							if(playButton.Collision(x,y,3,3,playButton.getX(),playButton.getY(),playButton.getW(),playButton.getH())){GAMESTATE = 4; player.resetScore(); Mix_PlayChannel(-1, click, 0);}
 							if(quitButton.Collision(x,y,3,3,quitButton.getX(),quitButton.getY(),quitButton.getW(),quitButton.getH())){gameRunning = false; Mix_PlayChannel(-1, click, 0);}
 						}
 
@@ -238,7 +240,7 @@ void Input(){
 									break;
 									case 2:
 										timeRemaining = 45;
-										scoreReq = 80;
+										scoreReq = 46;
 									break;
 								}
 							}
@@ -257,7 +259,7 @@ void Input(){
 									break;
 									case 2:
 										timeRemaining = 45;
-										scoreReq = 80;
+										scoreReq = 45;
 									break;
 								}
 							}
@@ -276,7 +278,7 @@ void Input(){
 									break;
 									case 2:
 										timeRemaining = 45;
-										scoreReq = 80;
+										scoreReq = 45;
 									break;
 								}
 							}
@@ -292,6 +294,7 @@ bool tick;
 void gLoop(){
 	//refreshes window
 	window.Clear();
+	
 
 	//GAMESTATES
 	
@@ -301,6 +304,8 @@ void gLoop(){
 		if(splashTimer.getShot())GAMESTATE = 0;
 	}
 	if(GAMESTATE == 0){
+		if(Mix_PlayingMusic() == 0)Mix_PlayMusic(mainMusic, -1);
+		if(Mix_PausedMusic() == 1)Mix_ResumeMusic();
 		//render shit needed
 		window.RenderFS(mmTex);
 		window.Render("Marshall Hates France", fontMM, 20, 500, white);
@@ -308,6 +313,8 @@ void gLoop(){
 		window.Render(quitButton);
 	}
 	if(GAMESTATE == 1){
+		if(Mix_PlayingMusic() == 0)Mix_PlayMusic(mainMusic, -1);
+		if(Mix_PausedMusic() == 1)Mix_ResumeMusic();
 		if(player.getScore() >= scoreReq){ GAMESTATE = 2; Mix_PlayChannel(-1, victory, 0);}
 		//render el frenchie,,,,
 		window.Render(french1);
@@ -334,10 +341,12 @@ void gLoop(){
 		window.Render(timeStr, font, WIDTH/2 -50, HEIGHT-590, black);
 	}
 	if(GAMESTATE == 2){
+		Mix_PauseMusic();
 		window.RenderFS(winTex);
 		window.Render("(press esc to go to main menu)", fontMM, 30, 400, black);
 	}
 	if(GAMESTATE == 3){
+		Mix_PauseMusic();
 		window.RenderFS(lossTex);
 		window.Render("(press esc to go to main menu)", fontMM, 30, 400, black);
 	}

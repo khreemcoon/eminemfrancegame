@@ -18,6 +18,7 @@ public:
 	void Update();
 	bool isDead(){return dead;}
 	int getScore(){return score;}
+	void resetScore(){score = 0;}
 	const char* getScoreChar();
 	void addScore(int num){score += num;}
 	void Reset();
