@@ -15,13 +15,13 @@ public:
         oneshot = pOneshot;
     }
     bool getShot(){return shot;}
-    void noShot(){shot = false;}
+    void setInterval(int pInterval){timeMS = pInterval;}
 
     void Update(){
         if(!permshot){
+            shot = false;
             currentTime = SDL_GetTicks();
             if(currentTime > lastTime + timeMS){
-                shot = false;
                 lastTime = currentTime;
                 if(oneshot){
                     permshot = true;

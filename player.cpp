@@ -22,3 +22,12 @@ const char* Player::getScoreChar(){
 	std::string s =std::to_string(score);
 	return s.c_str();
 }
+
+void Player::setHS(){
+	if(score >= highscore) highscore = score;
+	else highscore = highscore;
+}
+const char* Player::getHSChar(){
+	std::string s =std::to_string(highscore);
+	return s.c_str();
+}

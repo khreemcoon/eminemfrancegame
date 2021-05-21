@@ -8,6 +8,7 @@
 class Player:public Entity{
 private:
 	int score = 0;
+	int highscore = 0;
 	bool dead = false;
 	float clamp(float pMin, float pMax, float pVal);
 public:
@@ -18,8 +19,12 @@ public:
 	void Update();
 	bool isDead(){return dead;}
 	int getScore(){return score;}
-	void resetScore(){score = 0;}
 	const char* getScoreChar();
+	void resetScore(){score = 0;}
+
+	int getHS(){return highscore;}
+	const char* getHSChar();
+	void setHS();
 	void addScore(int num){score += num;}
 	void Reset();
 

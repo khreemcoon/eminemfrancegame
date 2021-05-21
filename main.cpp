@@ -49,6 +49,7 @@ SDL_Texture* qBtnTex          = NULL;
 SDL_Texture* easy             = NULL;
 SDL_Texture* med              = NULL;
 SDL_Texture* hard             = NULL;
+SDL_Texture* endless          = NULL;
 
 //Colors
 SDL_Color black   = {0,0,0};
@@ -102,6 +103,7 @@ bool Init(){
 	easy            = window.loadTexture("images/main menu images/easy.png");
 	med             = window.loadTexture("images/main menu images/med.png");
 	hard            = window.loadTexture("images/main menu images/hard.png");
+	endless         = window.loadTexture("images/main menu images/endless.png");
 
 	//loads the font and checks for errors in loading the font
 	font = TTF_OpenFont("fonts/Panic.ttf", 32);
@@ -135,6 +137,7 @@ Entity quitButton(640, 80, qBtnTex);
 Entity easyBtn(640, 90, easy);
 Entity medBtn(640, 180, med);
 Entity hardBtn(640, 270,hard);
+Entity endlessBtn(640, 360, endless);
 
 //Timers
 Timer splashTimer(3200, true);
@@ -229,58 +232,30 @@ void Input(){
 								Mix_PlayChannel(-1, click, 0);
 								difficulty = 0;
 								GAMESTATE = 1;
-								switch(difficulty){
-									case 0:
-										scoreReq = 50;
-										timeRemaining = 90;
-									break;				
-									case 1:
-										timeRemaining = 60;
-										scoreReq = 65;
-									break;
-									case 2:
-										timeRemaining = 45;
-										scoreReq = 46;
-									break;
-								}
+								scoreReq = 50;
+								timeRemaining = 90;
 							}
 							if(medBtn.Collision(x,y,3,3,medBtn.getX(),medBtn.getY(),medBtn.getW(),medBtn.getH())){
 								Mix_PlayChannel(-1, click, 0);
 								difficulty = 1;
 								GAMESTATE = 1;
-								switch(difficulty){
-									case 0:
-										scoreReq = 50;
-										timeRemaining = 90;
-									break;				
-									case 1:
-										timeRemaining = 60;
-										scoreReq = 65;
-									break;
-									case 2:
-										timeRemaining = 45;
-										scoreReq = 45;
-									break;
-								}
+								timeRemaining = 75;
+								scoreReq = 60;
 							}
 							if(hardBtn.Collision(x,y,3,3,hardBtn.getX(),hardBtn.getY(),hardBtn.getW(),hardBtn.getH())){
 								Mix_PlayChannel(-1, click, 0);
 								difficulty = 2;
 								GAMESTATE = 1;
-								switch(difficulty){
-									case 0:
-										scoreReq = 50;
-										timeRemaining = 90;
-									break;				
-									case 1:
-										timeRemaining = 60;
-										scoreReq = 65;
-									break;
-									case 2:
-										timeRemaining = 45;
-										scoreReq = 45;
-									break;
-								}
+								timeRemaining = 45;
+								scoreReq = 45;
+							}
+							if(endlessBtn.Collision(x,y,3,3,endlessBtn.getX(),endlessBtn.getY(),endlessBtn.getW(),endlessBtn.getH())){
+								Mix_PlayChannel(-1, click, 0);
+								difficulty = 3;
+								GAMESTATE = 1;
+								timeRemaining = 30;
+								scoreReq = -1;
+								countdown.setInterval(420);
 							}
 						}
 				}
@@ -315,14 +290,16 @@ void gLoop(){
 	if(GAMESTATE == 1){
 		if(Mix_PlayingMusic() == 0)Mix_PlayMusic(mainMusic, -1);
 		if(Mix_PausedMusic() == 1)Mix_ResumeMusic();
-		if(player.getScore() >= scoreReq){ GAMESTATE = 2; Mix_PlayChannel(-1, victory, 0);}
+		if(player.getScore() >= scoreReq && difficulty != 3){ GAMESTATE = 2; Mix_PlayChannel(-1, victory, 0);}
 		//render el frenchie,,,,
 		window.Render(french1);
 		//checks for collision between french and player
 		if(player.Collision(french1.getX(), french1.getY(), french1.getW(), french1.getH(), player.getX(), player.getY(), player.getW(), player.getH())){
-				Mix_PlayChannel(-1, collect, 0);
-				player.addScore(1);
-				french1.setRandPos();
+			if (difficulty == 3 && timeRemaining <= 70) timeRemaining += 2;
+			player.setHS();
+			Mix_PlayChannel(-1, collect, 0);
+			player.addScore(1);
+			french1.setRandPos();
 		}
 		//render eminem and call his update function
 		window.Render(player);
@@ -333,7 +310,7 @@ void gLoop(){
 		//time
 		countdown.Update();
 		if(timeRemaining > 0){
-			if(countdown.getShot()){timeRemaining -=1; countdown.noShot();}
+			if(countdown.getShot()){timeRemaining -=1;}
 		}else if(timeRemaining <= 0) {Mix_PlayChannel(-1, loss, 0);GAMESTATE = 3;}
 		
 		timeRem = std::to_string(timeRemaining);
@@ -352,13 +329,17 @@ void gLoop(){
 	}
 	if(GAMESTATE == 4){
 		window.RenderFS(difselTex);
-		window.Render("Difficulty:", fontMM, 540, 0, black);
+		window.Render("Difficulty:", fontMM, 540, 0, white);
 		window.Render(easyBtn);
 		window.Render("Easy:", fontMM, 510, 85, green);
 		window.Render(medBtn);
 		window.Render("Medium:", fontMM, 420, 180, yellow);
 		window.Render(hardBtn);
 		window.Render("Hard:", fontMM, 500, 270, red);
+		window.Render(endlessBtn);
+		window.Render("Endless:", fontMM, 440, 360, black);
+		window.Render("Highscore:", fontMM, 0, 500, green);
+		window.Render(player.getHSChar(), fontMM, 280,500,green);
 	}
 	//actually make the window show everything
 	window.Display();
